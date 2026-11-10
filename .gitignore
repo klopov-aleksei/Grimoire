@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+build/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Data
+data/
+rulebooks/
+*.pdf
+dumps/
+*.csv.gz
+*.zip
+
+# Models
+models/
+*.gguf
+*.safetensors
+*.bin
+*.pt
+checkpoints/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Local planning docs, not published
+PLAN.md
+architecture.svg
+Стажировки в AI-проекте.md
