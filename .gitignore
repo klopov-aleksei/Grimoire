@@ -15,7 +15,7 @@ build/
 !.env.example
 
 # Data
-data/
+/data/
 rulebooks/
 *.pdf
 dumps/
@@ -23,7 +23,7 @@ dumps/
 *.zip
 
 # Models
-models/
+/models/
 *.gguf
 *.safetensors
 *.bin
@@ -37,5 +37,10 @@ checkpoints/
 
 # Local planning docs, not published
 PLAN.md
-architecture.svg
+/architecture.svg
 Стажировки в AI-проекте.md
+
+# Tooling caches
+.coverage
+htmlcov/
+.ruff_cache/
