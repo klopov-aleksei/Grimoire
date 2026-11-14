@@ -1,0 +1,60 @@
+[project]
+name = "grimoire"
+version = "0.1.0"
+description = "AI assistant for a board-game club: rules answers with page citations, game suggestions, session log."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Klopov Aleksei" }]
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/grimoire"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.7.0",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=grimoire --cov-report=term-missing -m 'not integration'"
+markers = [
+    "integration: needs external services (Docker, LLM); deselected by default",
+]
+
+[tool.coverage.run]
+source = ["grimoire"]
+branch = true
+# The gate measures core logic only. Bot handlers, the LLM client wrapper and
+# scripts are thin wrappers around outside systems (Telegram, llama-server,
+# the shell); they are covered by integration tests rather than a percentage.
+omit = [
+    "src/grimoire/bot/*",
+    "src/grimoire/llm/client.py",
+    "scripts/*",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_also = ["if __name__ == .__main__.:"]

@@ -17,6 +17,29 @@ Early stage: planning only. There is no code in this repository yet.
 - A local LLM served by llama.cpp `llama-server`
 - Docker Compose for local deployment
 
+## Development
+
+Prerequisites: [uv](https://docs.astral.sh/uv/) and Docker.
+
+```sh
+make install   # uv sync and git hooks
+make check     # ruff lint, format check, unit tests with the coverage gate
+make up        # start docker compose services (make down to stop)
+```
+
+Run `make help` for all targets.
+
+## Project layout
+
+```text
+src/grimoire/   application package (db, llm, rag, api, bot, evaluation)
+tests/          unit/ and integration/ tests
+scripts/        one-off command-line scripts
+notebooks/      exploration notebooks
+db/             database init scripts
+docs/           decisions and other documentation
+```
+
 ## Use of BoardGameGeek data
 
 - This is a personal, non-commercial student project: no ads, no payments,
