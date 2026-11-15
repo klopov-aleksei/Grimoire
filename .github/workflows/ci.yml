@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: make lint
+      - run: make format-check
+
+  # The squash-merge commit on main takes the PR title as its message, so the
+  # title must follow Conventional Commits. Re-runs when the title is edited.
+  pr-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Check PR title with the project's commit-msg hook
+        env:
+          # Passed via env, never interpolated into the script (injection).
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          printf '%s\n' "$PR_TITLE" > "$RUNNER_TEMP/pr-title.txt"
+          uv run pre-commit run conventional-pre-commit \
+            --hook-stage commit-msg \
+            --commit-msg-filename "$RUNNER_TEMP/pr-title.txt"
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked # Python 3.13 comes from .python-version
+      - run: make test # unit tests with the 90% coverage gate
+
+  # Placeholder, added by issue #6 (database integration tests). Linux only,
+  # because GitHub service containers need an Ubuntu runner.
+  #
+  # integration:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     postgres:
+  #       image: pgvector/pgvector:pg17
+  #       env:
+  #         POSTGRES_PASSWORD: postgres
+  #       ports: ["5432:5432"]
+  #       options: >-
+  #         --health-cmd "pg_isready -U postgres" --health-interval 5s
+  #         --health-timeout 5s --health-retries 10
+  #   steps:
+  #     - uses: actions/checkout@...
+  #     - uses: astral-sh/setup-uv@...
+  #     - run: uv sync --locked
+  #     - run: make test-integration
