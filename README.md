@@ -1,5 +1,7 @@
 # Grimoire (Гримуар)
 
+[![CI](https://github.com/klopov-aleksei/Grimoire/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klopov-aleksei/Grimoire/actions/workflows/ci.yml?query=branch%3Amain)
+
 Grimoire is an AI assistant for a board-game club. It is a Telegram bot that
 answers rules questions with page citations from the official Russian
 rulebooks, suggests games from the club's own shelf, and keeps the club's
